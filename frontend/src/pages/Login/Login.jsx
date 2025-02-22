@@ -1,7 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import NavBar from "../../components/NavBar/NavBar";
 
 export default function Login() {
+
+  const navigate=useNavigate();
   return (
     <>
       <NavBar />
@@ -13,7 +15,12 @@ export default function Login() {
 
                 <input type="text" placeholder="Email" className="w-full text-sm bg-transparent border-[1.5px] px-5
  py-3 rounded mb-4 outline none" />
-                <button type="submit" className="w-full text-sm bg-blue-500 text-white p-2 rounded my-1 hover:bg-blue-600">Login</button>
+                <button 
+                  type="submit" className="w-full text-sm bg-blue-500 text-white p-2 rounded my-1 hover:bg-blue-600"
+                  onClick={()=>navigate('/dashboard')}
+                >
+                Login
+                </button>
 
                 <p className="text-sm text-center mt-4">Not yet registered {" "}
                 <Link to="/signup" className="font-medium text-primary underline">
