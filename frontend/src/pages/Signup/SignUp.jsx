@@ -4,10 +4,6 @@ import PasswordInput from "../../components/Input/PasswordInput";
 import { Link } from "react-router-dom";
 import { validateEmail } from "../../utils/helper";
 
-const handleSignUp=async(e) =>{
-  e.preventDefault();
-
-}
 export default function SignUp() {
 
 
@@ -34,6 +30,8 @@ export default function SignUp() {
       return;
     }
     setError('');
+
+    //Sign Up API Call
   }
   return (
    <>

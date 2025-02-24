@@ -49,6 +49,7 @@ export default function Login() {
     setPassword(e.target.value);
 
   }}
+  
  />
  {error && <p className="text-red-500 text-xs pb-1 ">{error}</p> }
   <button 
