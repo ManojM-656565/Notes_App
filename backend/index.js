@@ -22,11 +22,7 @@ const{authenticateToken} =require("./utilities")
 
 
 
-app.use(
-    cors({
-        origin:"*"
-    })
-)
+app.use(cors());
 
 app.get("/",(req,res)=>{
     res.json("hello")
@@ -76,7 +72,7 @@ app.post("/create-account",async (req,res) =>{
 
     await user.save();
 
-    const accesToken=jwt.sign({
+    const accessToken=jwt.sign({
         user
     },
     process.env.ACCESS_TOKEN_SECRET,{
@@ -86,7 +82,7 @@ app.post("/create-account",async (req,res) =>{
     return res.json({
         error:false,
         user,
-        accesToken,
+        accessToken,
         message:"Registration succesful",
 
 
@@ -125,7 +121,8 @@ app.post("/login", async (req,res) =>{
 
         return res.json({
             error:false,
-            message:"Login Succesful",
+            message:"Login Succesfull",
+            user,
             email,
             accesToken,
 
@@ -148,7 +145,9 @@ app.post("/login", async (req,res) =>{
 //GET USER
 
 app.get("/get-user",authenticateToken,async (req,res) =>{
+    // const {user} =req.user;
     const {user} =req.user;
+    // console.log(email);
     const isUser =await User.findOne({_id:user._id});
 
     if(!isUser){
@@ -158,7 +157,7 @@ app.get("/get-user",authenticateToken,async (req,res) =>{
     return res.json({
         user:{fullname:isUser.fullname,
             email:isUser.email,
-            "_id":isUser._i,
+            "_id":isUser._id,
             createdOn:isUser.createdOn
         },
         message:"",
@@ -166,7 +165,53 @@ app.get("/get-user",authenticateToken,async (req,res) =>{
 })
 
 
+// app.get("/get-user", authenticateToken, async (req, res) => {
+//     const user = req.user; // ✅ Extract email from JWT Token
+//     console.log("Extracted email:", email);
+
+//     const isUser = await User.findOne(user.email);
+
+//     if (!isUser) {
+//         return res.sendStatus(401);
+//     }
+
+//     return res.json({
+//         user: {
+//             fullname: isUser.fullname,
+//             email: isUser.email,
+//             _id: isUser._id,
+//             createdOn: isUser.createdOn
+//         },
+//         message: "",
+//     });
+// });
+
+
+
+
 //ADD NOTE
+
+
+app.get("/get-user", authenticateToken, async (req, res) => {
+    const user = req.user; // ✅ Extract email from JWT Token
+    console.log("Extracted email:", user.email); // ✅ Corrected
+
+    const isUser = await User.findOne({ email: user.email });
+
+    if (!isUser) {
+        return res.status(401).json({ message: "User not found" });
+    }
+
+    return res.json({
+        user: {
+            fullname: isUser.fullname,
+            email: isUser.email,
+            _id: isUser._id,
+            createdOn: isUser.createdOn,
+        },
+        message: "User retrieved successfully",
+    });
+});
 
 app.post("/add-note",authenticateToken, async (req,res) =>{
     const {title,content,tags} = req.body;

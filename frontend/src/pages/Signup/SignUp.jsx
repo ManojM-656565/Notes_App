@@ -1,8 +1,9 @@
 import { useState } from "react";
 import NavBar from "../../components/NavBar/NavBar";
 import PasswordInput from "../../components/Input/PasswordInput";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { validateEmail } from "../../utils/helper";
+import axiosInstance from "../../utils/axiosInstance";
 
 export default function SignUp() {
 
@@ -11,6 +12,8 @@ export default function SignUp() {
   const [email,setEmail]=useState("");
   const [password,setPassword]=useState("");
   const [error,setError]=useState(null);
+
+  const navigate=useNavigate();
 
   const handleSignUp=async (e)=>{
     e.preventDefault();
@@ -32,10 +35,35 @@ export default function SignUp() {
     setError('');
 
     //Sign Up API Call
+    try {
+      const response = await axiosInstance.post("/create-account", {
+        fullname:name,
+        email:email,
+        password:password,
+      });
+      console.log(response.data);
+
+      if (response.data && response.data.error) {
+        setError(response.data.message);
+        return;
+      }
+
+      if(response.data && response.data.accessToken){
+        localStorage.setItem("token",response.data.accessToken);
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      if (error.response?.data?.message) {
+        setError(error.response.data.message);
+      } else {
+        setError("Unexpected error occurred, please try again.");
+      }
+      console.error("Login Error:", error); // ✅ Improved logging
+    }
   }
   return (
    <>
-    <NavBar />
+    {/* <NavBar /> */}
 
     <div className="flex items-center justify-center mt-28">
       <div className="w-96 border rounded bg-white px-7 py-10">
