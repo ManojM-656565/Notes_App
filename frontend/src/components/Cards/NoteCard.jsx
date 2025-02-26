@@ -12,6 +12,7 @@ const NoteCard = ({
     onEdit,
     onDelete,
     onPinNote,
+    setDelete
 }
 ) => {
   return (
@@ -24,7 +25,7 @@ const NoteCard = ({
                 <span className="text-xs text-slate-500">{moment(date).format('Do MMM YYYY')}</span>
             </div>
             <MdOutlinePushPin 
-                className={`text-xl text-slate-300 cursor-pointer hover:text-primary ${isPinned ? 'text-blue-400' :'text-slate-300'}`}
+                className={`text-xl text-slate-300 cursor-pointer hover:text-blue-500 ${isPinned ? 'text-blue-400' :'text-slate-300'}`}
 
                 onClick={onPinNote}
             />
