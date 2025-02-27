@@ -10,11 +10,15 @@ const TagInput = ({ tags, setTags }) => {
 
   const addNewTag = () => {
     if (inputValue.trim() !== "" && !tags.includes(inputValue.trim())) {
-      setTags([...tags, inputValue.trim()]);
+      setTags((prevTags) => {
+        const newTags = [...prevTags, inputValue.trim()];
+        console.log("Tags:", newTags); // Correct logging
+        return newTags;
+      });
       setInputValue("");
-      console.log("Tags:", [...tags, inputValue.trim()]); // Debugging logs
     }
   };
+  
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -24,9 +28,13 @@ const TagInput = ({ tags, setTags }) => {
   };
 
   const handleRemoveTag = (tagToRemove) => {
-    setTags(tags.filter((tag) => tag !== tagToRemove));
-    console.log("Updated Tags:", tags.filter((tag) => tag !== tagToRemove)); // Debugging logs
+    setTags((prevTags) => {
+      const updatedTags = prevTags.filter((tag) => tag !== tagToRemove);
+      console.log("Updated Tags:", updatedTags); // Correct logging
+      return updatedTags;
+    });
   };
+  
 
   return (
     <div className="p-4 border border-gray-300 rounded bg-gray-100">
@@ -37,7 +45,7 @@ const TagInput = ({ tags, setTags }) => {
               key={index}
               className="flex items-center text-blue-900 px-2 py-1 rounded"
             >
-              <span className="mr-1"># {tag}</span>
+              <span className="mr-1">#{tag}</span>
               <button onClick={() => handleRemoveTag(tag)} className="text-red-500">
                 <MdClose />
               </button>

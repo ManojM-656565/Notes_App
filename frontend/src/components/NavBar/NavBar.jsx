@@ -28,6 +28,7 @@ export default function NavBar({userInfo,onSearchNote, handleClearSearch}) {
       value={searchQuery}
       onChange={({target})=>{
         setSearchQuery(target.value);
+        handleSearch(target.value);
       }}
       handleSearch={handleSearch}
       onClearSearch={onClearSearch}

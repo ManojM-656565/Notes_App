@@ -132,7 +132,7 @@ export default function Home() {
 
     try{
       const response =await axiosInstance.put("update-note-pinned/"+noteId , {
-        "isPinned" : noteData.isPinned
+        "isPinned" : !noteData.isPinned
       })
       if(response.data && response.data.note){
         showToastMessage({message:"Note Updated successfully",type:"edit"})

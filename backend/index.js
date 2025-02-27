@@ -261,7 +261,7 @@ app.get("/get-all-notes/",authenticateToken,async (req,res) =>{
 const {user} = req.user;
 
 try{
-    const notes=await Note.find({userId:user._id}).sort({isPinned:-1,});
+    const notes=await Note.find({userId:user._id}).sort({isPinned:-1});
 
     return res.json({
         error:false,
