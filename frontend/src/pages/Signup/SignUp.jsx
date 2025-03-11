@@ -1,5 +1,4 @@
 import { useState } from "react";
-import NavBar from "../../components/NavBar/NavBar";
 import PasswordInput from "../../components/Input/PasswordInput";
 import { Link, useNavigate } from "react-router-dom";
 import { validateEmail } from "../../utils/helper";
@@ -58,12 +57,11 @@ export default function SignUp() {
       } else {
         setError("Unexpected error occurred, please try again.");
       }
-      console.error("Login Error:", error); // ✅ Improved logging
+      console.error("Login Error:", error); 
     }
   }
   return (
    <>
-    {/* <NavBar /> */}
 
     <div className="flex items-center justify-center mt-28">
       <div className="w-96 border rounded bg-white px-7 py-10">

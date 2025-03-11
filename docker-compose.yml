@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"  # Maps frontend container to port 80 (default web port)
+    depends_on:
+      - backend
+    restart: always
+    env_file:
+      - ./frontend/.env
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"  # Maps backend container to port 5000
+    restart: always
+    env_file:
+      - ./backend/.env
