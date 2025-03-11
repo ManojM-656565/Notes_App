@@ -1,59 +1,61 @@
 #!/bin/bash
 
-# Configurations
-AWS_REGION="us-east-1"                  # Your AWS region
-INSTANCE_TYPE="t2.micro"                 # EC2 instance type
-AMI_ID="ami-0c55b159cbfafe1f0"           # Amazon Linux 2 AMI (change if needed)
-KEY_NAME="your-key-pair-name"            # Your AWS key pair (.pem file)
-SECURITY_GROUP="your-security-group-id"  # Security Group allowing ports 80 & 5000
+# Set AWS variables
+AWS_REGION="us-east-1"   # Change to your region
+INSTANCE_TYPE="t2.micro"
+AMI_ID="ami-0c55b159cbfafe1f0"  # Amazon Linux 2 AMI (find one for your region)
+KEY_NAME="NotesAppKey"   # Change to your AWS key pair name
+SECURITY_GROUP="sg-015895cddcc330457"  # Replace with your security group ID
 INSTANCE_NAME="NotesAppInstance"
-GIT_REPO="https://github.com/your-username/your-repo.git"  # Your GitHub repo
-DEPLOY_SCRIPT="remote-deploy.sh"
-REMOTE_PATH="/home/ubuntu/notes-app"
+GIT_REPO="https://github.com/ManojM-656565/Notes_App.git"
 
-# Step 1: Check for existing EC2 instance
-echo "Checking for existing EC2 instance..."
-INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$INSTANCE_NAME" \
-  --query "Reservations[*].Instances[*].InstanceId" --output text)
+# Check if EC2 instance already exists
+INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$INSTANCE_NAME" --query "Reservations[*].Instances[*].InstanceId" --output text)
 
 if [ -z "$INSTANCE_ID" ]; then
-  echo "No existing instance found. Creating a new EC2 instance..."
-  INSTANCE_ID=$(aws ec2 run-instances \
-    --image-id $AMI_ID \
-    --instance-type $INSTANCE_TYPE \
-    --key-name $KEY_NAME \
-    --security-group-ids $SECURITY_GROUP \
-    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$INSTANCE_NAME}]" \
-    --query "Instances[0].InstanceId" --output text)
+    echo "No existing EC2 instance found. Creating a new one..."
 
-  echo "Instance created: $INSTANCE_ID. Waiting for it to initialize..."
-  aws ec2 wait instance-running --instance-ids $INSTANCE_ID
-else
-  echo "Existing instance found: $INSTANCE_ID"
+    INSTANCE_ID=$(aws ec2 run-instances \
+        --image-id $AMI_ID \
+        --instance-type $INSTANCE_TYPE \
+        --key-name $KEY_NAME \
+        --security-group-ids $SECURITY_GROUP \
+        --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$INSTANCE_NAME}]" \
+        --query "Instances[0].InstanceId" --output text)
+
+    echo "Waiting for EC2 instance to initialize..."
+    sleep 30  # Wait for the instance to be available
 fi
 
-# Step 3: Get Public IP
-INSTANCE_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID \
-  --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
+# Get EC2 Public IP
+EC2_PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
 
-echo "EC2 Instance is ready at: $INSTANCE_IP"
+echo "EC2 instance is running at: $EC2_PUBLIC_IP"
 
-# Step 4: SSH into EC2 and Deploy the App
-ssh -o StrictHostKeyChecking=no -i "$KEY_NAME.pem" ubuntu@$INSTANCE_IP <<EOF
-  sudo apt update -y && sudo apt install -y docker.io docker-compose git
-  sudo systemctl start docker
-  sudo systemctl enable docker
+# Connect to EC2 & Deploy the app
+ssh -o StrictHostKeyChecking=no -i $KEY_NAME.pem ubuntu@$EC2_PUBLIC_IP << EOF
 
-  if [ ! -d "$REMOTE_PATH" ]; then
-    git clone $GIT_REPO $REMOTE_PATH
-  else
-    cd $REMOTE_PATH
-    git pull origin main
-  fi
+# Update system and install dependencies
+sudo apt update -y && sudo apt install -y docker docker-compose git
 
-  cd $REMOTE_PATH
-  sudo docker-compose up --build -d
-  echo "Deployment completed! Access app at http://$INSTANCE_IP"
+# Clone the repository (if not already cloned)
+if [ ! -d "NotesApp" ]; then
+    git clone $GIT_REPO NotesApp
+fi
+
+cd NotesApp
+
+# Pull the latest code
+git pull origin main
+
+# Update backend URL in frontend/.env
+echo "VITE_BACKEND_URL=http://$EC2_PUBLIC_IP:5000" > frontend/.env
+
+# Build and start the app using Docker Compose
+sudo docker-compose down
+sudo docker-compose build
+sudo docker-compose up -d
+
 EOF
 
-echo "Deployment completed! Visit: http://$INSTANCE_IP"
+echo "Deployment successful! Access your app at: http://$EC2_PUBLIC_IP"
