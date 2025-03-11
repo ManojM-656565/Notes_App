@@ -6,7 +6,7 @@
 # AWS Configuration
 AWS_REGION="us-east-1"   # Change this to your AWS region
 INSTANCE_TYPE="t2.micro"
-AMI_ID="ami-xxxxxxxxxxxx"  # Replace with the correct AMI ID for your region
+AMI_ID="ami-00cef6eb8e65487cc"  # Replace with the correct AMI ID for your region
 KEY_NAME="NotesAppKey"   # This must match the name of your key pair in AWS
 INSTANCE_NAME="NotesAppInstance"
 SECURITY_GROUP="sg-015895cddcc330457"  # Replace with your security group ID
